@@ -4,8 +4,6 @@ import SideBar from './pane/SideBar.js';
 import PaneToggle from './pane/PaneToggle.js';
 import ParseTreeToolbar from './ParseTreeToolbar.js';
 import Toolbar from './Toolbar.js';
-import createStore from './stores/create';
-import { addAllNodeIds, collapseAllNodes, collapseDescendants } from './stores/modules/ui';
 import {
   assignNodeIds,
   findAllNodeTypes,
@@ -32,7 +30,7 @@ import { Provider } from 'react-redux';
 export default class Tree extends Component {
   static get defaultProps() {
     return {
-      router: { transitionTo: () => {} },
+      router: { transitionTo: () => { } },
       urlText: undefined,
       parser: 'default',
       theme: undefined,
@@ -322,7 +320,7 @@ export default class Tree extends Component {
   }
 
   togglePane(mode) {
-    switch(mode) {
+    switch (mode) {
       case "open":
         this.setState({
           sideBarCollapsed: false,
@@ -342,26 +340,26 @@ export default class Tree extends Component {
 
   render() {
     const { text,
-            inputText,
-            jsonUrl,
-            styles,
-            positions,
-            linkLabels,
-            data,
-            jsonData,
-            layout,
-            selectedNodeId,
-            hoverNodeId,
-            selectedData,
-            sideBarCollapsed,
-            loading,
-            firstLoad,
-            emptyQuery,
-            errorState,
-            serverEndPoint } = this.state;
+      inputText,
+      jsonUrl,
+      styles,
+      positions,
+      linkLabels,
+      data,
+      jsonData,
+      layout,
+      selectedNodeId,
+      hoverNodeId,
+      selectedData,
+      sideBarCollapsed,
+      loading,
+      firstLoad,
+      emptyQuery,
+      errorState,
+      serverEndPoint } = this.state;
 
 
-    const { readOnly, theme, showSidebar } = this.props;
+    const { readOnly, theme, showSidebar, saveTree } = this.props;
 
     return (
       <div className={`hierplane${theme !== undefined ? ` hierplane--theme-${theme}` : ""}`}>
@@ -388,7 +386,7 @@ export default class Tree extends Component {
                   jsonUrl={jsonUrl}
                   jsonData={jsonData}
                   selectedData={selectedData}
-                  serverEndPoint={serverEndPoint} />: null}
+                  serverEndPoint={serverEndPoint} /> : null}
               <ParseTreeToolbar
                 disabled={!data || errorState || emptyQuery || loading} />
               <MainStage
@@ -409,6 +407,19 @@ export default class Tree extends Component {
                 firstLoad={firstLoad}
                 emptyQuery={emptyQuery}
                 errorState={errorState} />
+              <button style={{
+                position: 'absolute',
+                right: '20px',
+                bottom: '20px',
+                padding: '1rem',
+                fontSize: '1.2rem'
+              }}
+                onClick={() => {
+                  saveTree()
+                }}
+              >
+                Save
+              </button>
             </div>
             <PaneToggle
               icon={"sidebar"}
@@ -425,7 +436,7 @@ export default class Tree extends Component {
               sideBarCollapsed={sideBarCollapsed}
               fetchAltParse={this.fetchAltParse}
               togglePane={this.togglePane} />
-          ): null}
+          ) : null}
           <IconSprite />
         </div>
       </div>

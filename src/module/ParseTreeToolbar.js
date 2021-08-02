@@ -21,7 +21,7 @@ class ParseTreeToolbar extends Component {
     return (
       <ul className={`parse-tree-toolbar ${disabled ? "parse-tree-toolbar--disabled" : ""}`}>
         <li className="parse-tree-toolbar__item">
-          <TreeExpansionControl mode="implode" onClick={() => { collapseAllNodes() }}/>
+          <TreeExpansionControl mode="implode" onClick={() => { collapseAllNodes() }} />
           <div className="parse-tree-toolbar__item__label">Collapse all nodes</div>
           <div className="parse-tree-toolbar__item__mask"></div>
         </li>

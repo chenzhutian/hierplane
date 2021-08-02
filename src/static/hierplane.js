@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
 
 import createStore from '../module/stores/create';
-import { addAllNodeIds, collapseAllNodes, collapseDescendants } from '../module/stores/modules/ui';
+import { addAllNodeIds, collapseAllNodes, collapseDescendants, saveTree } from '../module/stores/modules/ui';
 
 import { Tree } from '../module/index.js';
 
@@ -35,10 +35,11 @@ export function renderTree(tree, options = { target: 'body', theme: 'dark' }) {
     return { tree: ui.tree }
   };
   // This is a hack, as to shim redux in at this level so that all dependencies of the tree are self contained
-  const ConnectedTree = connect(mapStateToProps, { addAllNodeIds, collapseAllNodes, collapseDescendants })(Tree);
+  const ConnectedTree = connect(mapStateToProps, { addAllNodeIds, collapseAllNodes, collapseDescendants, saveTree })(Tree);
 
   ReactDOM.render(
-    <Provider store={store}><ConnectedTree theme={options.theme ? options.theme : undefined} /></Provider>,
+    <Provider store={store}>
+      <ConnectedTree theme={options.theme ? options.theme : undefined} /></Provider>,
     // <Tree tree={tree} theme={options.theme ? options.theme : undefined} />,
     node
   );

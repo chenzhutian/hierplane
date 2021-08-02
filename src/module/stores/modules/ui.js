@@ -15,6 +15,7 @@ export const EXPAND_PATH_TO_NODE = 'EXPAND_PATH_TO_NODE';
 export const SET_NODE_TYPE = 'SET_NODE_TYPE'
 export const SET_DETAIL_TYPE = 'SET_DETAIL_TYPE'
 export const TOGGLE_MACHINE_OUTPUT = 'TOGGLE_MACHINE_OUTPUT'
+export const SAVE_TREE = 'SAVE_TREE'
 
 /**
  * Action Creators
@@ -90,6 +91,10 @@ export function setDetailType(id, type) {
 
 export function toggleMachineOutput(id) {
   return { id, type: TOGGLE_MACHINE_OUTPUT }
+}
+
+export function saveTree() {
+  return { type: SAVE_TREE }
 }
 
 /**
@@ -282,6 +287,14 @@ export default (state = initialState, action) => {
         ...state,
         expandedNodeIds: state.expandedNodeIds.union(pathToNode(action.id)),
       };
+    case SAVE_TREE:
+      /**
+       * @todo, push to the server
+       */
+      console.log('saveTree')
+      return {
+        ...state
+      }
     default:
       return state;
   }

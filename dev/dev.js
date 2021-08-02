@@ -26,6 +26,8 @@
 
           div.appendChild(select);
 
+          
+
           document.body.insertBefore(div, document.body.firstElementChild);
 
           renderTree(0);
