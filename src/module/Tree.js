@@ -29,7 +29,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
 
-class Tree extends Component {
+export default class Tree extends Component {
   static get defaultProps() {
     return {
       router: { transitionTo: () => {} },
@@ -433,12 +433,13 @@ class Tree extends Component {
   }
 }
 
-// We have no state to map to props, so we just return an empty object.
-const mapStateToProps = () => ({});
-const store = createStore();
+// // We have no state to map to props, so we just return an empty object.
+// const mapStateToProps = () => ({});
+// const store = createStore();
 
 // This is a hack, as to shim redux in at this level so that all dependencies of the tree are self contained
-const ConnectedTree = connect(mapStateToProps, { addAllNodeIds, collapseAllNodes, collapseDescendants })(Tree);
-export default ({ ...props }) => (
-  <Provider store={store}><ConnectedTree {...props} /></Provider>
-);
+// const ConnectedTree = connect(mapStateToProps, { addAllNodeIds, collapseAllNodes, collapseDescendants })(Tree);
+// export default ({ ...props }) => {
+//   console.log('props', props)
+//  return <Provider store={store}><ConnectedTree {...props} /></Provider>
+// }

@@ -1,7 +1,7 @@
 import Link from './Link.js';
 import MiddleParent from './MiddleParent.js';
 
-import { expandNode, toggleNode } from '../stores/modules/ui';
+import { expandNode, toggleNode, setNodeType, setDetailType, toggleMachineOutput } from '../stores/modules/ui';
 
 import classNames from 'classnames/bind';
 import { connect } from 'react-redux';
@@ -29,7 +29,7 @@ class Node extends Component {
 
   // Returns arrays of children grouped by positions set in
   // linkToPosition in the JSON:
-  createChildren (children, positions) {
+  createChildren(children, positions) {
     return children.reduce((children, child) => {
       let index = positions[child.link]
       if (index in children) {
@@ -43,7 +43,7 @@ class Node extends Component {
   }
 
   // Returns arrays of inside children grouped by kind:
-  countSeqChildren (children) {
+  countSeqChildren(children) {
     return children.reduce((children, child) => {
       const supportedKinds = new Set(["event", "entity", "detail"]);
       if (supportedKinds.has(child.nodeType)) {
@@ -56,6 +56,7 @@ class Node extends Component {
   // Node MouseUp Handler:
   handleNodeMouseUp(data) {
     const { focusNode, expandNode } = this.props;
+    console.debug('handleNodeMouseUp', data)
 
     this.setState({ nodeFocusing: false }, () => {
       focusNode(data);
@@ -67,6 +68,7 @@ class Node extends Component {
   // UiToggle MouseUp Handler:
   handleUiToggleMouseUp() {
     const { data, toggleNode } = this.props;
+    console.debug('handleUiToggleMouseUp')
 
     toggleNode(data.id);
 
@@ -76,6 +78,7 @@ class Node extends Component {
   // UiParseNav MouseUp Handler:
   handlePnToggleMouseUp(nodeData, direction) {
     const { data, fetchAltParse, loading } = this.props;
+    console.debug('handlePnToggleMouseUp')
 
     this.handleNodeMouseUp(data);
 
@@ -127,30 +130,33 @@ class Node extends Component {
   render() {
     const { active, nodeFocusing, rollups, focused } = this.state;
     const { readOnly,
-            styles,
-            positions,
-            linkLabels,
-            data,
-            layout,
-            depth,
-            parentId,
-            text,
-            selectedNodeId,
-            hoverNodeId,
-            isSingleSegment,
-            focusNode,
-            hoverNode,
-            fetchAltParse,
-            togglePane,
-            directionalChildIndex,
-            loading,
-            expandedNodeIds } = this.props;
+      styles,
+      positions,
+      linkLabels,
+      data,
+      layout,
+      depth,
+      parentId,
+      text,
+      selectedNodeId,
+      hoverNodeId,
+      isSingleSegment,
+      focusNode,
+      hoverNode,
+      fetchAltParse,
+      togglePane,
+      directionalChildIndex,
+      loading,
+      setNodeType,
+      setDetailType,
+      toggleMachineOutput,
+      expandedNodeIds } = this.props;
 
     let leftChildren = null,
-        rightChildren = null,
-        downChildren = null,
-        insideChildren = null,
-        canonicalChildren = null;
+      rightChildren = null,
+      downChildren = null,
+      insideChildren = null,
+      canonicalChildren = null;
 
     let childNodes;
     // Immediate child position detection and array building.
@@ -159,7 +165,7 @@ class Node extends Component {
     }
 
     let seqType = null,
-        seqChildren;
+      seqChildren;
 
     // Setting value of seqType (sequence inherits type based on kind of its inside children)
     if (data.children && data.nodeType === "sequence" && childNodes.inside.length > 0) {
@@ -180,11 +186,11 @@ class Node extends Component {
     }
 
     let hasChildren = false,
-        hasSideChildren = false,
-        hasLeftChildren = false,
-        hasRightChildren = false,
-        hasDownChildren = false,
-        hasInsideChildren = false;
+      hasSideChildren = false,
+      hasLeftChildren = false,
+      hasRightChildren = false,
+      hasDownChildren = false,
+      hasInsideChildren = false;
     // Testing if there are children.
     if (data.children) {
       // Testing if there are any side children.
@@ -206,7 +212,7 @@ class Node extends Component {
             onClick={() => { focusNode(data) }}
             onMouseOver={this.handleNodeMouseOver}
             onMouseOut={this.handleNodeMouseOut}
-            onMouseDown={() => {this.setState({nodeFocusing: true})}}>
+            onMouseDown={() => { this.setState({ nodeFocusing: true }) }}>
           </div>
         );
       }
@@ -325,8 +331,40 @@ class Node extends Component {
       "node-container--toggle-ready": active === "toggle-ready",
     });
 
+    const attributes = data.attributes || []
+    const detailOptions = !attributes[1]
+      ? ''
+      : <div>
+        <label htmlFor="ddw_detailType">is:</label>
+        <select name="ddw_detailType" id="ddw_detailType" value={data.attributes[2]}
+          onChange={e => {
+            setDetailType(data.id, e.target.value)
+          }}
+        >
+          {attributes[1] === 'opnode'
+            ? ['extreme', 'comparefilter', 'computed', 'constnumber'].map(o => <option key={o.toLowerCase()} value={o.toLowerCase()} >{o}</option>)
+            : attributes[1] === 'tasknode'
+              ? ['retrieve_value', 'find_extremum', 'filter', 'derived_value', 'distribution', 'outlier', 'correlation', 'negation', 'trend', 'comparison'].map(o => <option key={o.toLowerCase()} value={o.toLowerCase()} >{o}</option>)
+              : attributes[1] === 'tablenode'
+                ? ['attr', 'item', 'value'].map(o => <option key={o.toLowerCase()} value={o.toLowerCase()} >{o}</option>)
+                : ''}
+        </select>
+      </div>
+
+    const machineGenChecker = !attributes[1]
+      ? ''
+      : <div>
+        <input type="checkbox" id="auto" name="auto" value={attributes[3]} 
+          onChange={e => {
+            toggleMachineOutput(data.id)
+          }}
+        
+        />
+        <label htmlFor="auto">Machine</label>
+      </div>
+
     const nodeContent = (
-      <div className={`ft ${ftConditionalClasses}`}
+      <div className={`ft ${ftConditionalClasses}`} style={{ position: 'relative' }}
         data-has-children={hasChildren}>
         <div className="ft__tr">
           {leftChildren}
@@ -359,11 +397,11 @@ class Node extends Component {
             dataPos={dataPos}
             togglePane={togglePane}
             isEventRoot={isEventRoot}
-            onUiMouseOver={() => {this.setState({active: "toggle-ready"})}}
-            onPnMouseOver={() => {this.setState({active: "hover"})}}
-            onUiMouseOut={() => {this.setState({active: null})}}
-            onPnMouseOut={() => {this.setState({active: null})}}
-            onMouseDown={() => {this.setState({nodeFocusing: true})}}
+            onUiMouseOver={() => { this.setState({ active: "toggle-ready" }) }}
+            onPnMouseOver={() => { this.setState({ active: "hover" }) }}
+            onUiMouseOut={() => { this.setState({ active: null }) }}
+            onPnMouseOut={() => { this.setState({ active: null }) }}
+            onMouseDown={() => { this.setState({ nodeFocusing: true }) }}
             onMouseOver={this.handleNodeMouseOver}
             onMouseOut={this.handleNodeMouseOut}
             onMouseUp={this.handleNodeMouseUp}
@@ -377,22 +415,54 @@ class Node extends Component {
           {rightChildren}
         </div>
         {downChildren}
+        {focused && <div style={{
+          position: 'absolute',
+          padding: '12px',
+          width: '100px',
+          // height: '100px',
+          backgroundColor: 'red',
+          top: 0,
+          left: '100%',
+          zIndex: 900,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px'
+        }}>
+          <div>
+            <label htmlFor="ddw_nodeType">NodeType:</label>
+            <select
+              name="ddw_nodeType"
+              id="ddw_nodeType"
+              value={attributes[1] || 'Null'}
+              onChange={e => {
+                // should set this value
+                console.log('onChange selection', e, e.target.value)
+                setNodeType(data.id, e.target.value)
+              }}
+            >
+              {['Null', 'OpNode', 'TaskNode', 'TableNode'].map(o =>
+                <option key={o.toLowerCase()} value={o.toLowerCase()} >{o}</option>)}
+            </select>
+          </div>
+          {detailOptions}
+          {machineGenChecker}
+        </div>}
       </div>
     );
 
     const nodeContentStructure = encapsulated || eventSeqChild ? (
-        <div
-          className={`encapsulated ${eventSeqChild ? "event-seq-child" : ""} ${!isCollapsed && hasChildren ? "event-seq-child--expanded" : ""}`}
-          data-pos={dataPos}>
-          {(eventSeqChild && notFirstInsideChild) || (encapsulated && dataPos === "right") ? (
-              <Link link={data.link} dataPos={dataPos} layout={layout} linkLabels={linkLabels} id={data.id} />
-            ) : null}
-          {nodeContent}
-          {!eventSeqChild && dataPos === "left" ? (
-              <Link link={data.link} dataPos={dataPos} layout={layout} linkLabels={linkLabels} id={data.id} />
-            ) : null}
-        </div>
-      ) : nodeContent;
+      <div
+        className={`encapsulated ${eventSeqChild ? "event-seq-child" : ""} ${!isCollapsed && hasChildren ? "event-seq-child--expanded" : ""}`}
+        data-pos={dataPos}>
+        {(eventSeqChild && notFirstInsideChild) || (encapsulated && dataPos === "right") ? (
+          <Link link={data.link} dataPos={dataPos} layout={layout} linkLabels={linkLabels} id={data.id} />
+        ) : null}
+        {nodeContent}
+        {!eventSeqChild && dataPos === "left" ? (
+          <Link link={data.link} dataPos={dataPos} layout={layout} linkLabels={linkLabels} id={data.id} />
+        ) : null}
+      </div>
+    ) : nodeContent;
 
     return nodeContentStructure;
   }
@@ -435,6 +505,6 @@ const mapStateToProps = ({ ui }) => ({
 // exported, "wrapped with connect" definition, which is a higher-ordered component that has been
 // decorated with redux store state. The fix is to assign the wrapped version of Node to a new
 // variable here, export that, and call it when we recurse.
-const NodeWrapper = connect(mapStateToProps, { expandNode, toggleNode })(Node);
+const NodeWrapper = connect(mapStateToProps, { expandNode, toggleNode, setNodeType, setDetailType, toggleMachineOutput })(Node);
 
 export default NodeWrapper;

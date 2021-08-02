@@ -6,4 +6,4 @@ import { createStore } from 'redux';
 // https://github.com/zalmoxisus/redux-devtools-extension
 const devToolExtension = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__();
 
-export default () => createStore(rootReducer, devToolExtension);
+export default (preLoadState = {}) => createStore(rootReducer, preLoadState, devToolExtension);

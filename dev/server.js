@@ -49,7 +49,7 @@ app.get('/api/samples', (req, res) => {
   });
 });
 
-const port = process.env.HIERPLANE_DEV_SERVER_PORT || 3000;
+const port = process.env.HIERPLANE_DEV_SERVER_PORT || 5505;
 app.listen(port, () => {
   console.log(`listening at ${chalk.blue(`http://localhost:${port}`)}`);
 });

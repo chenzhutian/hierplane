@@ -1,4 +1,5 @@
 import Immutable from 'immutable';
+import { func } from 'prop-types';
 
 /**
  * Action Type Constants
@@ -11,6 +12,9 @@ export const COLLAPSE_DESCENDANTS = 'COLLAPSE_DESCENDANTS';
 export const EXPAND_NODE = 'EXPAND_NODE';
 export const EXPAND_ALL_NODES = 'EXPAND_ALL_NODES';
 export const EXPAND_PATH_TO_NODE = 'EXPAND_PATH_TO_NODE';
+export const SET_NODE_TYPE = 'SET_NODE_TYPE'
+export const SET_DETAIL_TYPE = 'SET_DETAIL_TYPE'
+export const TOGGLE_MACHINE_OUTPUT = 'TOGGLE_MACHINE_OUTPUT'
 
 /**
  * Action Creators
@@ -66,6 +70,26 @@ export function expandNode(id) {
     id,
     type: EXPAND_NODE,
   };
+}
+
+export function setNodeType(id, type) {
+  return {
+    id,
+    type: SET_NODE_TYPE,
+    payload: { type }
+  }
+}
+
+export function setDetailType(id, type) {
+  return {
+    id,
+    type: SET_DETAIL_TYPE,
+    payload: { type }
+  }
+}
+
+export function toggleMachineOutput(id) {
+  return { id, type: TOGGLE_MACHINE_OUTPUT }
 }
 
 /**
@@ -125,10 +149,12 @@ const initialState = {
   expandableNodeIds: Immutable.Set(),
   expandedNodeIds: Immutable.Set(),
   exploded: false,
+  tree: {},
 };
 
 export default (state = initialState, action) => {
-  switch(action.type) {
+  console.log('action', action)
+  switch (action.type) {
     case ADD_ALL_NODE_IDS:
       return {
         ...state,
@@ -153,7 +179,7 @@ export default (state = initialState, action) => {
         expandedNodeIds: state.expandedNodeIds.filterNot(isChildOf(action.id)),
       };
     case EXPAND_NODE:
-      return (function() {
+      return (function () {
         const { expandedNodeIds, expandableNodeIds } = state;
         const newExpandedNodeIds = expandedNodeIds.add(action.id);
 
@@ -163,8 +189,78 @@ export default (state = initialState, action) => {
           expandedNodeIds: newExpandedNodeIds,
         };
       })();
-    case TOGGLE_NODE_STATE:
+    case SET_NODE_TYPE:
+      return (function () {
+        const { id } = action
+        const { type } = action.payload
+        const path = id.split('.')
+        const { tree } = state
+        console.log('path', path)
+        const root = tree.root
+        let node = root
+        for (const idx of path.slice(1)) {
+          node = root.children[+idx]
+        }
+        node.attributes[1] = type
+        switch (type) {
+          case 'opnode':
+            node.attributes[2] = 'extreme'
+            break
+          case 'tasknode':
+            node.attributes[2] = 'retrieve_value'
+            break
+          case 'tablenode':
+            node.attributes[2] = 'attr'
+            break
+          case 'null':
+            node.attributes = node.attributes.slice(0, 1)
+        }
+
+        return {
+          ...state,
+          tree: JSON.parse(JSON.stringify(tree))
+        }
+      })();
+    case SET_DETAIL_TYPE:
+      return (function () {
+        const { id } = action
+        const { type } = action.payload
+        const path = id.split('.')
+        const { tree } = state
+        console.log('path', path)
+        const root = tree.root
+        let node = root
+        for (const idx of path.slice(1)) {
+          node = root.children[+idx]
+        }
+        node.attributes[2] = type
+        return {
+          ...state,
+          tree: JSON.parse(JSON.stringify(tree))
+        }
+      })();
+    case TOGGLE_MACHINE_OUTPUT:
       return (function() {
+        const { id } = action
+        const path = id.split('.')
+        const { tree } = state
+        const root = tree.root
+        let node = root
+        for (const idx of path.slice(1)) {
+          node = root.children[+idx]
+        }
+        if(node.attributes[3]) {
+          node.attributes = node.attributes.slice(0, 3)
+        } else {
+          node.attributes[3] = 'ML'
+        }
+        return {
+          ...state,
+          tree: JSON.parse(JSON.stringify(tree))
+        }
+      })();
+    case TOGGLE_NODE_STATE:
+      return (function () {
         const { expandedNodeIds: prevIds, expandableNodeIds } = state;
         const id = action.id;
         const newExpandedNodeIds = prevIds.has(id) ? prevIds.delete(id) : prevIds.add(id);
