@@ -115,8 +115,24 @@ export default class Tree extends Component {
     this.populateError = this.populateError.bind(this);
   }
 
+
+  onSave = (e) => {
+    if ((window.navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey) && e.keyCode == 83) {
+      e.preventDefault();
+      // Process the event here (such as click on submit button)
+      console.log('save')
+      this.props.saveTree()
+    }
+  }
+
   componentDidMount() {
     this.handleEmpty();
+    //
+    document.addEventListener('keydown', this.onSave, false)
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.onSave)
   }
 
   handleEmpty() {
@@ -206,7 +222,7 @@ export default class Tree extends Component {
     // If this is a new query, i.e., not an alternate parse, then clear the expandedNodeIds.
     // Otherwise, collapse all the open descendant nodes.
     if (!includesSubTree) {
-      if(fetchedData.text !== this.state.text)
+      if (fetchedData.text !== this.state.text)
         collapseAllNodes();
     } else {
       collapseDescendants(selectedData.id);
