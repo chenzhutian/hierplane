@@ -1,5 +1,4 @@
 import Immutable from 'immutable';
-import { func } from 'prop-types';
 
 /**
  * Action Type Constants
@@ -204,7 +203,7 @@ export default (state = initialState, action) => {
         const root = tree.root
         let node = root
         for (const idx of path.slice(1)) {
-          node = root.children[+idx]
+          node = node.children[+idx]
         }
         node.attributes[1] = type
         switch (type) {
@@ -223,6 +222,7 @@ export default (state = initialState, action) => {
 
         return {
           ...state,
+          expandedNodeIds: Immutable.Set(state.expandedNodeIds),
           tree: JSON.parse(JSON.stringify(tree))
         }
       })();
@@ -236,7 +236,7 @@ export default (state = initialState, action) => {
         const root = tree.root
         let node = root
         for (const idx of path.slice(1)) {
-          node = root.children[+idx]
+          node = node.children[+idx]
         }
         node.attributes[2] = type
         return {
@@ -245,16 +245,16 @@ export default (state = initialState, action) => {
         }
       })();
     case TOGGLE_MACHINE_OUTPUT:
-      return (function() {
+      return (function () {
         const { id } = action
         const path = id.split('.')
         const { tree } = state
         const root = tree.root
         let node = root
         for (const idx of path.slice(1)) {
-          node = root.children[+idx]
+          node = node.children[+idx]
         }
-        if(node.attributes[3]) {
+        if (node.attributes[3]) {
           node.attributes = node.attributes.slice(0, 3)
         } else {
           node.attributes[3] = 'ML'
@@ -291,7 +291,22 @@ export default (state = initialState, action) => {
       /**
        * @todo, push to the server
        */
-      console.log('saveTree')
+
+      // get file id
+      const file = document.getElementById('tree_file')
+      const fileName = file.options[file.value].text
+
+      fetch('/api/tree', {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          tree: state.tree,
+          file: fileName
+        })
+      })
+
       return {
         ...state
       }

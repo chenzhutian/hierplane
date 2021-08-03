@@ -142,10 +142,12 @@ export default class Tree extends Component {
 
   componentWillReceiveProps({ urlText, tree }) {
     const decoded = decodeURI(urlText);
+    console.log('componentWillReceiveProps', tree)
 
     if (this.state.text !== decoded) {
       this.fetchInitialParse(decoded, tree);
     }
+
   }
 
   populateData(data, fetchPath, selectedData, includesSubTree = false) {
@@ -204,7 +206,8 @@ export default class Tree extends Component {
     // If this is a new query, i.e., not an alternate parse, then clear the expandedNodeIds.
     // Otherwise, collapse all the open descendant nodes.
     if (!includesSubTree) {
-      collapseAllNodes();
+      if(fetchedData.text !== this.state.text)
+        collapseAllNodes();
     } else {
       collapseDescendants(selectedData.id);
     }
