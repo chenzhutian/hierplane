@@ -342,7 +342,7 @@ class Node extends Component {
           }}
         >
           {attributes[1] === 'opnode'
-            ? ['extreme', 'comparefilter', 'computed', 'constnumber', 'compare'].map(o => <option key={o.toLowerCase()} value={o.toLowerCase()} >{o}</option>)
+            ? ['extreme', 'comparefilter', 'computed', 'constnumber', 'compare', 'distribute'].map(o => <option key={o.toLowerCase()} value={o.toLowerCase()} >{o}</option>)
             : attributes[1] === 'tasknode'
               ? ['retrieve_value', 'find_extremum', 'filter', 'derived_value', 'distribution', 'outlier', 'correlation', 'negation', 'trend', 'comparison'].map(o => <option key={o.toLowerCase()} value={o.toLowerCase()} >{o}</option>)
               : attributes[1] === 'tablenode'
