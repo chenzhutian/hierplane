@@ -342,7 +342,7 @@ class Node extends Component {
           }}
         >
           {attributes[1] === 'opnode'
-            ? ['extreme', 'comparefilter', 'computed', 'constnumber', 'compare', 'distribute', 'cluster'].map(o => <option key={o.toLowerCase()} value={o.toLowerCase()} >{o}</option>)
+            ? ['extreme', 'comparefilter', 'computed', 'constnumber', 'compare', 'distribute', 'cluster', 'correlation', 'sort'].map(o => <option key={o.toLowerCase()} value={o.toLowerCase()} >{o}</option>)
             : attributes[1] === 'tasknode'
               ? ['retrieve_value', 'find_extremum', 'filter', 'derived_value', 'distribution', 'outlier', 'correlation', 'cluster', 'range', 'sort', 'comparison'].map(o => <option key={o.toLowerCase()} value={o.toLowerCase()} >{o}</option>)
               : attributes[1] === 'tablenode'
@@ -354,11 +354,11 @@ class Node extends Component {
     const machineGenChecker = !attributes[1]
       ? ''
       : <div>
-        <input type="checkbox" id="auto" name="auto" value={attributes[3]} 
+        <input type="checkbox" id="auto" name="auto" value={attributes[3]}
           onChange={e => {
             toggleMachineOutput(data.id)
           }}
-        
+
         />
         <label htmlFor="auto">Machine</label>
       </div>

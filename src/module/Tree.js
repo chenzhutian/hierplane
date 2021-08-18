@@ -125,6 +125,8 @@ export default class Tree extends Component {
     }
   }
 
+
+
   componentDidMount() {
     this.handleEmpty();
     //
@@ -439,6 +441,42 @@ export default class Tree extends Component {
               >
                 Save
               </button>
+
+              <button style={{
+                position: 'absolute',
+                right: '120px',
+                bottom: '20px',
+                padding: '1rem',
+                fontSize: '1.2rem'
+              }}
+                onClick={() => {
+                  const select = document.getElementById('tree_file')
+                  console.log(select, select.value, select.options.length)
+                  select.value = Math.min(+select.value + 1, select.options.length).toString()
+                  const evt = new Event('change', {})
+                  select.dispatchEvent(evt)
+                }}
+              >
+                Next
+              </button>
+
+              <button style={{
+                position: 'absolute',
+                right: '200px',
+                bottom: '20px',
+                padding: '1rem',
+                fontSize: '1.2rem'
+              }}
+                onClick={() => {
+                  const select = document.getElementById('tree_file')
+                  select.value = Math.max(+select.value - 1, 0).toString()
+                  const evt = new Event('change', {})
+                  select.dispatchEvent(evt)
+                }}
+              >
+                Prev
+              </button>
+
             </div>
             <PaneToggle
               icon={"sidebar"}

@@ -90,5 +90,5 @@
     unmount = hierplane.renderTree(tree, { target: `#${containerId}` });
   }
 
-  renderSelectTreeUI(event => { renderTree(event.target.value) })
+  renderSelectTreeUI(event => renderTree(event.target.value))
 })();
